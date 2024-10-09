@@ -54,58 +54,58 @@ class ChatScreen extends StatelessWidget {
                 children: [
                   Expanded(
                       child: StreamBuilder(
-                        stream: CloudFireStoreService.cloudFireStoreService
-                            .readChatFromFireStore(
+                    stream: CloudFireStoreService.cloudFireStoreService
+                        .readChatFromFireStore(
                             chatController.receiverEmail.value),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text(snapshot.error.toString()),
-                            );
-                          }
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          List data = snapshot.data!.docs;
-                          List<ChatModel> chatList = [];
-                          List<String> docIdList = [];
-                          for (QueryDocumentSnapshot snap in data) {
-                            docIdList.add(snap.id);
-                            chatList.add(ChatModel.fromMap(snap.data() as Map));
-                          }
-                          return SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              // mainAxisAlignment: MainAxisAlignment.end,
-                              children: List.generate(
-                                chatList.length,
-                                    (index) => GestureDetector(
-                                  onLongPress: () {
-                                    if (chatList[index].sender ==
-                                        AuthService.authService
-                                            .getCurrentUser()!
-                                            .email!) {
-                                      chatController.txtUpdateMessage =
-                                          TextEditingController(
-                                              text: chatList[index].message);
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text('update'),
-                                            content: TextField(
-                                              controller:
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text(snapshot.error.toString()),
+                        );
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      List data = snapshot.data!.docs;
+                      List<ChatModel> chatList = [];
+                      List<String> docIdList = [];
+                      for (QueryDocumentSnapshot snap in data) {
+                        docIdList.add(snap.id);
+                        chatList.add(ChatModel.fromMap(snap.data() as Map));
+                      }
+                      return SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          // mainAxisAlignment: MainAxisAlignment.end,
+                          children: List.generate(
+                            chatList.length,
+                            (index) => GestureDetector(
+                              onLongPress: () {
+                                if (chatList[index].sender ==
+                                    AuthService.authService
+                                        .getCurrentUser()!
+                                        .email!) {
+                                  chatController.txtUpdateMessage =
+                                      TextEditingController(
+                                          text: chatList[index].message);
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('update'),
+                                        content: TextField(
+                                          controller:
                                               chatController.txtUpdateMessage,
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                  onPressed: () {
-                                                    String dcId = docIdList[index];
-                                                    CloudFireStoreService
-                                                        .cloudFireStoreService
-                                                        .updateChat(
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                String dcId = docIdList[index];
+                                                CloudFireStoreService
+                                                    .cloudFireStoreService
+                                                    .updateChat(
                                                         chatController
                                                             .receiverEmail
                                                             .value,
@@ -113,80 +113,80 @@ class ChatScreen extends StatelessWidget {
                                                             .txtUpdateMessage
                                                             .text,
                                                         dcId);
-                                                    Get.back();
-                                                  },
-                                                  child: const Text('Update')),
-                                            ],
-                                          );
-                                        },
+                                                Get.back();
+                                              },
+                                              child: const Text('Update')),
+                                        ],
                                       );
-                                    }
-                                  },
-                                  onDoubleTap: () {
-                                    CloudFireStoreService.cloudFireStoreService
-                                        .removeChat(docIdList[index],
+                                    },
+                                  );
+                                }
+                              },
+                              onDoubleTap: () {
+                                CloudFireStoreService.cloudFireStoreService
+                                    .removeChat(docIdList[index],
                                         chatController.receiverEmail.value);
-                                  },
-                                  child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: 8, right: 14, left: 14),
-                                      child: Container(
-                                        alignment: (chatList[index].sender ==
+                              },
+                              child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 8, right: 14, left: 14),
+                                  child: Container(
+                                    alignment: (chatList[index].sender ==
                                             AuthService.authService
                                                 .getCurrentUser()!
                                                 .email!)
-                                            ? Alignment.centerRight
-                                            : Alignment.centerLeft,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8.0),
-                                          decoration: BoxDecoration(
-                                            color: (chatList[index].sender ==
+                                        ? Alignment.centerRight
+                                        : Alignment.centerLeft,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      decoration: BoxDecoration(
+                                        color: (chatList[index].sender ==
                                                 AuthService.authService
                                                     .getCurrentUser()!
                                                     .email!)
-                                                ? const Color(0xff41B3A2)
-                                                : const Color(0xffA594F9),
-                                            borderRadius: (chatList[index].sender ==
+                                            ? const Color(0xff41B3A2)
+                                            : const Color(0xffA594F9),
+                                        borderRadius: (chatList[index].sender ==
                                                 AuthService.authService
                                                     .getCurrentUser()!
                                                     .email!)
-                                                ? const BorderRadius.only(
-                                              topLeft: Radius.circular(13),
-                                              bottomLeft: Radius.circular(13),
-                                              bottomRight:
-                                              Radius.circular(13),
-                                            )
-                                                : const BorderRadius.only(
-                                              topRight: Radius.circular(13),
-                                              bottomLeft: Radius.circular(13),
-                                              bottomRight:
-                                              Radius.circular(13),
-                                            ),
-                                          ),
-                                          // child:Image.network( chatList[index].image!),
+                                            ? const BorderRadius.only(
+                                                topLeft: Radius.circular(13),
+                                                bottomLeft: Radius.circular(13),
+                                                bottomRight:
+                                                    Radius.circular(13),
+                                              )
+                                            : const BorderRadius.only(
+                                                topRight: Radius.circular(13),
+                                                bottomLeft: Radius.circular(13),
+                                                bottomRight:
+                                                    Radius.circular(13),
+                                              ),
+                                      ),
+                                      // child:Image.network( chatList[index].image!),
 
-                                          child: (chatList[index].image!.isEmpty &&
+                                      child: (chatList[index].image!.isEmpty &&
                                               chatList[index].image == "")
-                                              ? Text(
-                                            chatList[index]
-                                                .message!
-                                                .toString(),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          )
-                                              : Container(
-                                            height: 300,
-                                            child: Image.network(
-                                                chatList[index].image!),
-                                          ),
-                                        ),
-                                      )),
-                                ),
-                              ),
+                                          ? Text(
+                                              chatList[index]
+                                                  .message!
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          : Container(
+                                              height: 300,
+                                              child: Image.network(
+                                                  chatList[index].image!),
+                                            ),
+                                    ),
+                                  )),
                             ),
-                          );
-                        },
-                      )),
+                          ),
+                        ),
+                      );
+                    },
+                  )),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -206,11 +206,12 @@ class ChatScreen extends StatelessWidget {
                           },
                           controller: chatController.txtMessage,
                           decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.emoji_emotions_outlined),
+                            prefixIcon:
+                                const Icon(Icons.emoji_emotions_outlined),
                             hintText: "Message",
                             border: const OutlineInputBorder(
                                 borderSide:
-                                BorderSide(color: Colors.blue, width: 2)),
+                                    BorderSide(color: Colors.blue, width: 2)),
                             suffixIcon: IconButton(
                                 onPressed: () async {
                                   String url = await StorageService.service
@@ -242,10 +243,10 @@ class ChatScreen extends StatelessWidget {
                                   .addChatInFireStore(chat);
                               await LocalNotificationService.notificationService
                                   .showNotification(
-                                  AuthService.authService
-                                      .getCurrentUser()!
-                                      .email!,
-                                  chatController.txtMessage.text);
+                                      AuthService.authService
+                                          .getCurrentUser()!
+                                          .email!,
+                                      chatController.txtMessage.text);
                               chatController.txtMessage.clear();
                               chatController.getImage("");
                             },
